@@ -84,6 +84,10 @@ public class BoardController {
 			boardid = "1";
 		}
 		session.setAttribute("boardid", boardid);
+		if(searchtype == null || searchcontent == null || searchtype.trim().equals("") || searchcontent.trim().equals("")) {
+			searchtype = null;
+			searchcontent = null;
+		}
 		String boardName = null;
 		switch(boardid) {
 			case "1" : boardName = "공지사항"; break;
