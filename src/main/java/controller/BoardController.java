@@ -73,7 +73,8 @@ public class BoardController {
 		if(param.get("pageNum") != null)
 			pageNum = Integer.parseInt(param.get("pageNum"));
 		String boardid = param.get("boardid");
-		
+		String searchtype = param.get("searchtype");
+		String searchcontent = param.get("searchcontent");
 		
 		ModelAndView mav = new ModelAndView();
 		if(pageNum == null || pageNum.toString().equals("")) {
@@ -90,9 +91,9 @@ public class BoardController {
 			case "3" : boardName = "QNA"; break;
 		}
 		int limit = 10; // 한페이지에 보여줄 게시물 건수
-		int listcount = service.boardcount(boardid); // 등록 게시물 건수
+		int listcount = service.boardcount(boardid,searchtype,searchcontent); // 등록 게시물 건수
 		// boardlist :  현재페이지에 보여줄 게시물 목록
-		List<Board> boardlist = service.boardlist(pageNum,limit,boardid);
+		List<Board> boardlist = service.boardlist(pageNum,limit,boardid,searchtype,searchcontent);
 		
 		//페이징 처리를 위한 값
 		int maxpage = (int)((double)listcount/limit + 0.95); //등록 건수에 따른 최대 페이지 

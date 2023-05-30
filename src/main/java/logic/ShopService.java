@@ -143,13 +143,13 @@ public class ShopService {
 		boardDao.insert(board);
 	}
 	
-	public int boardcount(String boardid) {
+	public int boardcount(String boardid, String searchtype, String searchcontent) {
 		
-		return boardDao.count(boardid);
+		return boardDao.count(boardid,searchtype,searchcontent);
 	}
 	
-	public List<Board> boardlist(Integer pageNum, int limit, String boardid) {
-		return boardDao.list(pageNum,limit,boardid);
+	public List<Board> boardlist(Integer pageNum, int limit, String boardid, String searchtype, String searchcontent) {
+		return boardDao.list(pageNum,limit,boardid,searchtype,searchcontent);
 	}
 	
 	public Board getBoard(Integer num) {

@@ -43,17 +43,26 @@ public class BoardDao {
 		template.update(sql, param);
 	}
 
-	public int count(String boardid) {
+	public int count(String boardid, String searchtype, String searchcontent) {
 		String sql = "select count(*) from board where boardid=:boardid";
 		param.clear();
 		param.put("boardid", boardid);
+		if(searchtype != null && searchcontent != null) {
+			sql += " and " + searchtype + " like :searchcontent";
+			param.put("searchcontent","%" + searchcontent + "%");
+		}
 		return template.queryForObject(sql, param, Integer.class);
 	}
 
-	public List<Board> list(Integer pageNum, int limit, String boardid) {
+	public List<Board> list(Integer pageNum, int limit, String boardid, String searchtype,String searchcontent) {
 		param.clear();
 		String sql = select;
-		sql += " where boardid=:boardid order by grp desc, grpstep asc limit :startrow, :limit";
+		sql += " where boardid=:boardid";
+		if(searchtype != null && searchcontent != null) {
+			sql += " and " + searchtype + " like :searchcontent";
+			param.put("searchcontent","%"+searchcontent + "%");
+		}
+		sql += " order by grp desc grpstep asc limit :startrow, :limit";
 		param.put("startrow", (pageNum - 1) * limit); //1페이지 : 0,  2페이지 : 10
 		param.put("limit", limit);
 		param.put("boardid", boardid);
