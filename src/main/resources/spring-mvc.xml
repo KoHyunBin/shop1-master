@@ -64,4 +64,14 @@
   <websocket:handlers>
       <websocket:mapping handler="echoHandler" path="/chatting"/>
   </websocket:handlers>     
+  
+<!-- 인터셉터 설정 : 요청 url에 실행 전 후에 처리 -->
+  <mvc:interceptors>
+  	<mvc:interceptor>
+  		<mvc:mapping path="/board/write"/>
+  		<mvc:mapping path="/board/update"/>
+  		<mvc:mapping path="/board/delete"/>
+  		<bean class="interceptor.BoardInterceptor"/>
+  	</mvc:interceptor>
+  </mvc:interceptors>
 </beans>

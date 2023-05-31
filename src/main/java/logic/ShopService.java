@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import dao.BoardDao;
@@ -157,5 +158,17 @@ public class ShopService {
 	}
 	public void addreadCnt(Integer num) {
 		boardDao.addReadCnt(num);
+	}
+	
+	@Transactional	//보통 service에 넣는다 트랜젝션 처리함 업무를 원자화(All or nothing)
+	public void boardReply(Board board, Integer num) {
+		int maxNum = boardDao.maxNum();
+		Board b = boardDao.selectOne(num);
+		board.setGrpstep(b.getGrpstep() +1);
+		board.setGrplevel(b.getGrplevel()+1);
+		board.setGrp(b.getGrp());
+		board.setNum(++maxNum);
+		boardDao.grpStepAdd(b.getGrp(),b.getGrpstep());
+		boardDao.insert(board);
 	}
 }

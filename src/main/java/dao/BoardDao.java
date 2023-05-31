@@ -62,7 +62,7 @@ public class BoardDao {
 			sql += " and " + searchtype + " like :searchcontent";
 			param.put("searchcontent","%"+searchcontent + "%");
 		}
-		sql += " order by grp desc grpstep asc limit :startrow, :limit";
+		sql += " order by grp desc, grpstep asc limit :startrow, :limit";
 		param.put("startrow", (pageNum - 1) * limit); //1페이지 : 0,  2페이지 : 10
 		param.put("limit", limit);
 		param.put("boardid", boardid);
@@ -80,6 +80,15 @@ public class BoardDao {
 		param.clear();
 		param.put("num", num);
 		String sql = "update board set readcnt = readcnt + 1 where num=:num";
+		template.update(sql, param);
+	}
+
+	public void grpStepAdd(int grp, int grpstep) {
+		param.clear();
+		param.put("grp", grp);		   //원글의 grp
+		param.put("grpstep", grpstep); //원글의 grpstep
+		String sql = "update board set grpstep = grpstep + 1"
+				+ " where grp=:grp and grpstep > :grpstep";
 		template.update(sql, param);
 	}
 

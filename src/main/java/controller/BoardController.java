@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import exception.BoardException;
+import exception.LoginException;
 import logic.Board;
 import logic.ShopService;
 
@@ -52,6 +54,7 @@ public class BoardController {
 		request.getSession().setAttribute("boardid", boardid);
 		board.setBoardid(boardid);
 		service.boardWrite(board,request);
+		
 		mav.setViewName("redirect:list?boardid="+boardid);
 		return mav;
 	}
@@ -131,6 +134,60 @@ public class BoardController {
 			mav.addObject("boardName","자유게시판");
 		else if(board.getBoardid().equals("3"))
 			mav.addObject("boardName","QNA");
+		return mav;
+	}
+	
+	@GetMapping("reply")
+	public ModelAndView getBoard(Integer num, HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		String boardid = (String)session.getAttribute("boardid");
+		Board board = service.getBoard(num);
+		mav.addObject("board",board);
+		if(boardid == null || boardid.equals("1")) {
+			mav.addObject("boardName","공지사항");
+		}
+		else if (boardid.equals("2")) {
+			mav.addObject("boardName","자유게시판");
+		}
+		else if(boardid.equals("3")) {
+			mav.addObject("boardName","QnA");
+		}
+		return mav;
+	}
+	
+	/*
+	 * 1. 유효성 검사하기 - 파라미터값 저장.
+	 * 	- 원글정보 : num,grp,grplevel,grpstep,boardid
+	 * 	- 답글정보 : writer,pass,subject,content
+	 * 2. db에 insert => service/boardReply()
+	 * 	- 원글의 grpstep 보다 큰 이미 등록된 답글의 grpstep 값을 +1
+	 * 		=> boardDao.grpStepAdd()
+	 * - num : maxNum() + 1
+	 * - db에 insert => boardDao.insert()
+	 * 		grp : 원글과 동일
+	 * 		grplevel : 원글의 grplevel + 1
+	 * 		grpstep	 : 원글의 grpstep + 1
+	 * 3. 등록 성공 : list로 페이지 이동
+	 * 	  등록 실패 : "답변 등록시 오류 발생" reply 페이지 이동
+	 */
+	@PostMapping("reply")
+	public ModelAndView reply(Integer num,@Valid Board board, BindingResult bresult,HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		//유효성 검증
+		if(bresult.hasErrors()) {
+			Board dbboard = service.getBoard(board.getNum()); //원글 정보를 db에서 읽기
+			Map<String,Object> map = bresult.getModel();
+			Board b = (Board)map.get("board");//화면에서 입력받은 값을 저장한 Board 객체
+			b.setTitle(dbboard.getTitle());//원글의 제목으로 변경
+			mav.getModel().putAll(bresult.getModel());
+			return mav;
+		}
+		try {
+			service.boardReply(board,num);
+			mav.setViewName("redirect:list?boardid="+board.getBoardid());
+		} catch(Exception e) {
+			throw new LoginException("답변 등록시 오류 발생","reply?num="+board.getNum());
+		}
 		return mav;
 	}
 }
