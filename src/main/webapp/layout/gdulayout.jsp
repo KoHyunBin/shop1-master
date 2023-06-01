@@ -196,6 +196,41 @@ function w3_close() {
   overlayBg.style.display = "none";
 }
 </script>
-
+<script>
+	$(function(){
+		getSido2()
+	})
+	function getSido() {
+		$.ajax({
+			url : "${path}/ajax/select",
+			success : function(arr){
+				//arr : 서버에서 전달 받는 리스트 객체를 배열로 인식함
+				console.log(arr)
+				$.each(arr,function(i,item){
+					// i : 인덱스 첨자. 0부터 시작
+					//item : 배열의 요소
+					$("select[name=si]").append(function(){
+						return "<option>"+item+"</option>"
+					})
+				}) 
+			}
+		})
+	}
+	function getSido2(){ //서버에서 문자열로 전달 받기
+		$.ajax({
+			url : "${path}/ajax/select2",
+			success : function(data){ //data : [서울특별시,... 제주특별자치도], 문자열
+				console.log(data)
+				//arr : 배열객체
+				let arr = data.substring(data.indexOf('[')+1, data.indexOf(']')).split(",");
+				$.each(arr,function(i,item){
+					$("select[name=si]").append(function(){
+						return "<option>"+item+"</option>"
+					})
+				}) 
+			}
+		})
+	}
+</script>
 </body>
 </html>

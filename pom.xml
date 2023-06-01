@@ -137,6 +137,24 @@
 		<artifactId>spring-websocket</artifactId>
         <version>${spring.version}</version>
 	</dependency>
+<!--
+	@RestController 의 메서드에서 리턴값을 JavaScript의 객체로 변경해주는 설정
+	리턴타입 : List => 배열 객체로
+			Map  => Json 객체로 변경
+ -->
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-core</artifactId>
+    <version>2.13.4</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.13.4</version>
+</dependency>
+
  </dependencies>
  <build>
     <finalName>shop1</finalName>
