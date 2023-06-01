@@ -84,7 +84,7 @@ public class UserDao {
 	public String search(User user) {
 		String col = "userid";
 		if(user.getUserid() != null) col = "password";
-		String sql ="select "+ col +" from useraccount1 "
+		String sql ="select "+ col +" from useraccount "
 				+ "where email=:email and phoneno=:phoneno";
 		if(user.getUserid() != null) {
 			sql += " and userid=:userid";

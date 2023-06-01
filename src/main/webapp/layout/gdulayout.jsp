@@ -149,6 +149,24 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   <footer class="w3-container w3-padding-16 w3-light-grey">
     <h4>FOOTER</h4>
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+    <hr>
+    <div>
+    <span id='si'>
+    	<select name="si" onchange="getText('si')">
+    		<option value="">시도를 선택하세요</option>
+    	</select>
+    </span>
+    <span id='gu'>
+    	<select name="gu" onchange="getText('gu')">
+    		<option value="">구군을 선택하세요</option>
+    	</select>
+    </span>
+    <span id='dong'>
+    	<select name="dong" onchange="getText('dong')">
+    		<option value="">동리를 선택하세요</option>
+    	</select>
+    </span>
+    </div>
   </footer>
 
   <!-- End page content -->

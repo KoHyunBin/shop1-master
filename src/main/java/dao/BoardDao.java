@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,19 @@ public class BoardDao {
 		String sql = "update board set grpstep = grpstep + 1"
 				+ " where grp=:grp and grpstep > :grpstep";
 		template.update(sql, param);
+	}
+
+	public void update(Board board) {
+		SqlParameterSource param = 
+			     new BeanPropertySqlParameterSource(board);
+		String sql = "update board set writer=:writer,"
+		+ "title=:title,content=:content,"
+		+ "file1=:fileurl where num=:num";		
+	    template.update(sql, param);		
+	}
+
+	public void delete(Integer num) {
+		template.update("delete from board where num="+num, param);
 	}
 
 	

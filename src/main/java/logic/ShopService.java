@@ -48,7 +48,7 @@ public class ShopService {
 		item.setId(maxid+1);
 		itemDao.insert(item); //db에 데이터 추가 
 	}
-	private void uploadFileCreate(MultipartFile file, String path) {
+	public void uploadFileCreate(MultipartFile file, String path) {
 		//file : 파일의 내용
 		//path : 업로드할 폴더
 		String orgFile = file.getOriginalFilename(); //파일이름
@@ -170,5 +170,16 @@ public class ShopService {
 		board.setNum(++maxNum);
 		boardDao.grpStepAdd(b.getGrp(),b.getGrpstep());
 		boardDao.insert(board);
+	}
+	public void boardUpdate(Board board,HttpServletRequest request) {
+		if(board.getFile1() != null && !board.getFile1().isEmpty()) {
+			String path = request.getServletContext().getRealPath("/") + "board/file/";
+			this.uploadFileCreate(board.getFile1(), path); //파일 업로드 : board.getFile1()의 내용을 파일로 생성
+			board.setFileurl(board.getFile1().getOriginalFilename());
+		}
+		boardDao.update(board);
+	}
+	public void boardDelete(Integer num) {
+		boardDao.delete(num);
 	}
 }

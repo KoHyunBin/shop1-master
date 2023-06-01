@@ -47,7 +47,8 @@
 	  <!-- exception.CartEmptyException 예외 발생 => 
 	                  /WEB-INF/view/exception.jsp 로 제어 이동  -->
 	  <value>exception.CartEmptyException=exception
-	         exception.LoginException=exception</value>
+	         exception.LoginException=exception
+	  		 exception.BoardException=exception</value>
  	</property>
 </bean>
 <!-- message 처리 설정 : messages.properties : 기본

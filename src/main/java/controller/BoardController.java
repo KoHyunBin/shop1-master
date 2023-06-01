@@ -11,11 +11,13 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import exception.BoardException;
@@ -137,7 +139,7 @@ public class BoardController {
 		return mav;
 	}
 	
-	@GetMapping("reply")
+	@GetMapping({"reply","update","delete"})
 	public ModelAndView getBoard(Integer num, HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		String boardid = (String)session.getAttribute("boardid");
@@ -190,4 +192,84 @@ public class BoardController {
 		}
 		return mav;
 	}
-}
+	
+	/*
+	 * 1.유효성 검증.
+	 * 2.비밀번호 검증 => 검증 오류 : 비밀번호가 틀립니다. 메세지 출력. update 페이지 이동
+	 * 3.업로드된 파일이 있는 경우는 파일업로드 db의 내용 수정
+	 * 4.수정완료 : detail 페이지 이동
+	 * 5.수정실패 : update 페이지 이동
+	 * 
+	 */
+	@PostMapping("update")
+	public ModelAndView update(@Valid Board board, BindingResult bresult, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView();
+		if(bresult.hasErrors()) {
+			mav.getModel().putAll(bresult.getModel());
+			return mav;
+		}
+		Board b = service.getBoard(board.getNum());
+		if(!board.getPass().equals(b.getPass())) {
+			throw new BoardException("비밀번호가 틀립니다.","update?num="+board.getNum());
+		}
+		try {
+			service.boardUpdate(board,request);
+			mav.setViewName("redirect:detail?num="+board.getNum());
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new BoardException("게시글 수정에 실패 했습니다.","update?num="+board.getNum());
+		}
+		return mav;
+	}
+	
+	/*
+	 * 1. num,pass 파라미터 저장 => 매개변수 처리
+	 * 2. 비밀번호 검증 : db에서 num 게시글 조회 db에 등록된 비밀번호와 입력된 비밀번호 비교
+	 * 			비밀번호 오류 : error.board.password 코드값 설정 => delete.jsp로 전달
+	 * 3. 비밀번호 일치 : db에서 num 게시글 삭제.
+	 * 			삭제 성공 : list 페이지 이동
+	 * 			삭제 실패 : delete 페이지 이동
+	 */
+	@PostMapping("delete")
+	public ModelAndView delete(Board board,BindingResult bresult ) {
+		ModelAndView mav = new ModelAndView();
+		if(board.getPass() == null || board.getPass().trim().equals("")) {
+			bresult.reject("error.required.password");
+			return mav;
+		}
+		Board dbboard = service.getBoard(board.getNum());
+		if(!board.getPass().equals(dbboard.getPass())) {
+			bresult.reject("error.board.password");
+			return mav;
+		}
+		try {
+			service.boardDelete(board.getNum());
+			mav.setViewName("redirect:list?boardid="+dbboard.getBoardid());
+		} catch(Exception e){
+			e.printStackTrace();
+			bresult.reject("error.board.fail");
+		}
+		return mav;
+	}
+	
+	@RequestMapping("imgupload")
+	public String imgupload(MultipartFile upload, String CKEditorFuncNum, HttpServletRequest request, Model model) {
+		/*
+		 *  upload : CKEditor 모듈에서 업로드되는 이미지의 이름.
+		 *  		 업로드되는 이미지파일의 내용. 이미지값
+		 *  CKEditorFuncNum : CKEditor 모듈에서 파라미터로 전달되는 값. 리턴해야되는 값
+		 *  model : ModelAndView 중 Model에 해당하는 객체
+		 *  		뷰에 전달할 데이터정보 저장할 객체
+		 *  return 타입 String : 뷰의 이름 
+		 */
+		//업로드 되는 위치 폴더
+		//request.getServletContext().getRealPath("/") : 웹어플리케이션의 절대 경로 값.
+		String path = request.getServletContext().getRealPath("/") + "board/imgfile/";
+		service.uploadFileCreate(upload,path);//upload (파일의내용),path(업로드되는 폴더)
+		//request.getContextPath() : 프로젝트명(웹어플리케이션서버이름) shop1/
+		String fileName = request.getContextPath() //웹어플리케이션 경로. 웹 url 정보
+				+ "/board/imgfile/" + upload.getOriginalFilename();
+		model.addAttribute("fileName",fileName);
+		return "ckedit";//view 이름. /WEB-INF/view/ckedit.jsp
+	}
+} 
