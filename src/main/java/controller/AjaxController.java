@@ -51,6 +51,38 @@ public class AjaxController {
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
+		}  else if (gu == null) { //si파라미터값은 null이 아님
+			si = si.trim();
+			try {
+				while((data=fr.readLine()) != null) {
+					String[] arr = data.split("\\s+");
+					if(arr.length >=3 && arr[0].equals(si) &&
+							!arr[1].contains(arr[0]))
+						set.add(arr[1].trim()); //구군 정보 설정
+				}
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			si = si.trim();
+			gu = gu.trim();
+			try {
+				while((data=fr.readLine()) != null) {
+					String[] arr = data.split("\\s+");
+					if(arr.length >=3 && arr[0].equals(si) &&
+						arr[1].equals(gu) &&
+						!arr[1].contains(arr[0]) &&
+						!arr[2].contains(arr[1])) {
+						if(arr.length > 3) {
+							if(arr[3].contains(arr[1])) continue;
+							arr[2] += " " + arr[3];
+						}								
+						set.add(arr[2].trim()); //동리 정보 설정
+					}
+				}
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 		List<String> list = new ArrayList<>(set); //Set 객체 => List 객체로
 		return list;
@@ -82,18 +114,6 @@ public class AjaxController {
 				while((data=fr.readLine()) != null) {
 					String[] arr = data.split("\\s+");
 					if(arr.length >= 3) set.add(arr[0].trim()); //중복제거됨.
-				}
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-		} else if (gu == null ) {
-			si = si.trim();
-			try {
-				while((data=fr.readLine()) != null) {
-					String[] arr = data.split("\\s+");
-					if(arr.length >=3 && arr[0].equals(si) &&
-							!arr[1].contains(arr[0]))
-						set.add(arr[1].trim()); //구군 정보 설정
 				}
 			} catch(IOException e) {
 				e.printStackTrace();
